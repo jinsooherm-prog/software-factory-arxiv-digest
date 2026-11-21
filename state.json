@@ -1,0 +1,91 @@
+{
+  "seen_ids": [
+    "2611.21084v1",
+    "2611.20218v1",
+    "2611.21298v1",
+    "2611.25380v1",
+    "2611.23067v1"
+  ],
+  "history": [
+    {
+      "date": "2026-11-21",
+      "papers": [
+        {
+          "id": "2611.21084v1",
+          "pub": "2026-11-16T13:32:37+00:00",
+          "title": "CompCert4Lean: Porting a Verified C Compiler to Lean in Six Weeks with Parallel Coding Agents",
+          "link": "http://arxiv.org/abs/2611.21084v1",
+          "authors": [
+            "See arXiv listing"
+          ],
+          "cats": [
+            "cs.PL",
+            "cs.LO"
+          ],
+          "why": "The clearest real-world demonstration yet of a 'software factory': one expert directing a fleet of parallel LLM agents to do months of formal-verification engineering in weeks.",
+          "summary_text": "The authors port CompCert 3.17's verified compiler core from Rocq (Coq) to Lean in roughly six weeks, with one human expert orchestrating parallel LLM coding agents rather than hand-translating the proofs. The migration workflow partitions the codebase along its dependency graph, has agents translate definitions and theorems in parallel, then audits the results for faithfulness to the original verified semantics. It's a concrete case study in treating a large, high-assurance engineering project as an assembly line of agent workers with a human supervisor, rather than a single autonomous agent doing everything end to end."
+        },
+        {
+          "id": "2611.20218v1",
+          "pub": "2026-11-15T19:39:01+00:00",
+          "title": "SWE-CoWork: Benchmarking Coding Agents as Digital Employees in Organizations",
+          "link": "http://arxiv.org/abs/2611.20218v1",
+          "authors": [
+            "See arXiv listing"
+          ],
+          "cats": [
+            "cs.SE",
+            "cs.AI"
+          ],
+          "why": "Directly tests the 'agent as digital employee inside a software factory' framing, not just isolated coding tasks.",
+          "summary_text": "SWE-CoWork introduces a benchmark of 101 development assignments spanning 101 real repositories, 11 programming languages, and 12 application domains, explicitly framed around what a coding agent must do as a member of a software organization: figure out what to build, collaborate with colleagues/stakeholders, and verify that what it delivers is actually correct and complete \u2014 not just whether tests pass. It pushes evaluation beyond solo bug-fixing benchmarks toward the organizational, collaborative texture of real software production."
+        },
+        {
+          "id": "2611.21298v1",
+          "pub": "2026-11-16T16:01:06+00:00",
+          "title": "Agent-Native by Design: A Programming Language for Agentic Applications",
+          "link": "http://arxiv.org/abs/2611.21298v1",
+          "authors": [
+            "See arXiv listing"
+          ],
+          "cats": [
+            "cs.PL",
+            "cs.AI",
+            "cs.SE"
+          ],
+          "why": "Proposes new language-level infrastructure purpose-built for assembling agentic software, i.e. tooling for the factory floor itself.",
+          "summary_text": "The paper argues that today's agent frameworks and SDKs force developers to hand-write a lot of glue code to combine LLM calls, workflow structure, application state, and model-guided routing \u2014 and that this glue is exactly where bugs and brittleness creep in. It proposes a programming language designed 'agent-native from the ground up,' with first-class constructs for state propagation and model-guided control flow, aiming to make building agentic applications (including agents that themselves write software) a principled language-design problem rather than an afterthought bolted onto general-purpose code."
+        },
+        {
+          "id": "2611.25380v1",
+          "pub": "2026-11-19T02:20:06+00:00",
+          "title": "Beyond Weight Updates: Evolving Agent Harnesses for Domain Specialization",
+          "link": "http://arxiv.org/abs/2611.25380v1",
+          "authors": [
+            "See arXiv listing"
+          ],
+          "cats": [
+            "cs.AI"
+          ],
+          "why": "Reframes 'specializing an agent for a domain' as harness engineering rather than model fine-tuning \u2014 relevant to standing up many domain-specific agent factories cheaply.",
+          "summary_text": "Domain specialization of LLM agents is usually treated as a weight-update problem: collect trajectories, run RL or SFT, ship a new checkpoint. This paper studies the complementary axis of evolving the agent harness itself \u2014 system prompt, tool schemas, and surrounding scaffolding \u2014 as the unit of optimization instead of the model weights. That matters for software factories because it suggests you can retarget a generic coding agent to a new domain or codebase by evolving its harness rather than retraining or fine-tuning, which is far cheaper and faster to iterate on."
+        },
+        {
+          "id": "2611.23067v1",
+          "pub": "2026-11-17T16:56:46+00:00",
+          "title": "Values Shape What Self-Improving Coding Agents Build",
+          "link": "http://arxiv.org/abs/2611.23067v1",
+          "authors": [
+            "See arXiv listing"
+          ],
+          "cats": [
+            "cs.AI",
+            "cs.MA"
+          ],
+          "why": "A pointed alignment question for autonomous software factories: once agents self-improve with little oversight, what governs *how* they build, not just *what*?",
+          "summary_text": "Self-improving coding agents are typically optimized for the end results they produce, with little attention paid to how they get there, especially on open-ended tasks where designers have limited levers to shape process rather than outcome. This paper tests whether inserting a short value statement into an agent's persona/instructions measurably changes what a self-improving coding agent chooses to build and how it works \u2014 a small intervention with large implications for anyone trying to run a largely autonomous, self-improving software production pipeline safely."
+        }
+      ]
+    }
+  ]
+}
