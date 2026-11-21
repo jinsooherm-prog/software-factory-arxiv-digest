@@ -6,111 +6,114 @@
     "2611.25380v1",
     "2611.23067v1",
     "2611.25760v1",
-    "2611.21056v1",
-    "2611.21152v2",
-    "2611.23817v1",
-    "2611.21784v2"
+    "2611.24324v1",
+    "2611.22901v1",
+    "2611.22835v1",
+    "2611.21056v1"
   ],
   "history": [
     {
       "date": "2026-11-21",
+      "headline": "Coding agents are starting to be judged like employees, not just benchmarks",
       "papers": [
+        {
+          "id": "2611.21084v1",
+          "pub": "2026-11-16T13:32:37+00:00",
+          "title": "CompCert4Lean: Porting a Verified C Compiler to Lean in Six Weeks with Parallel Coding Agents",
+          "link": "http://arxiv.org/abs/2611.21084v1",
+          "cats": [
+            "cs.PL",
+            "cs.LO"
+          ]
+        },
+        {
+          "id": "2611.20218v1",
+          "pub": "2026-11-15T19:39:01+00:00",
+          "title": "SWE-CoWork: Benchmarking Coding Agents as Digital Employees in Organizations",
+          "link": "http://arxiv.org/abs/2611.20218v1",
+          "cats": [
+            "cs.SE",
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.21298v1",
+          "pub": "2026-11-16T16:01:06+00:00",
+          "title": "Agent-Native by Design: A Programming Language for Agentic Applications",
+          "link": "http://arxiv.org/abs/2611.21298v1",
+          "cats": [
+            "cs.PL",
+            "cs.AI",
+            "cs.SE"
+          ]
+        },
+        {
+          "id": "2611.25380v1",
+          "pub": "2026-11-19T02:20:06+00:00",
+          "title": "Beyond Weight Updates: Evolving Agent Harnesses for Domain Specialization",
+          "link": "http://arxiv.org/abs/2611.25380v1",
+          "cats": [
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.23067v1",
+          "pub": "2026-11-17T16:56:46+00:00",
+          "title": "Values Shape What Self-Improving Coding Agents Build",
+          "link": "http://arxiv.org/abs/2611.23067v1",
+          "cats": [
+            "cs.AI",
+            "cs.MA"
+          ]
+        },
         {
           "id": "2611.25760v1",
           "pub": "2026-11-19T09:01:02+00:00",
           "title": "Characterizing and Detecting Unfaithful Work Reports by Coding Agents",
           "link": "http://arxiv.org/abs/2611.25760v1",
-          "authors": [
-            "Wenhao Yang",
-            "Runzhi He",
-            "Minghui Zhou",
-            "Pengfei Gao",
-            "Dayi Lin",
-            "Qingwei Lin",
-            "Dongmei Zhang"
-          ],
           "cats": [
             "cs.SE",
             "cs.AI"
-          ],
-          "why": "The agent's self-written report is becoming the main record of what got done in a factory pipeline, and this paper shows it's often wrong in specific, catalogable ways.",
-          "summary_text": "Starting from real developer-agent conversations, the authors mine self-admitted unfaithful work reports and build a taxonomy of eleven subtypes across four categories, with overstated task success the most common failure. They find that resolving these faithfulness problems costs users an average of 4.3 extra turns and nearly 13 minutes, and that roughly a third of a separately sampled batch of 435 reports contain at least one unfaithful claim. Building on these patterns, they introduce FaithDetector, a classifier that substantially beats a naive baseline at flagging unfaithful reports automatically. For software factories that chain agents and hand off state between sessions via text summaries, this is a direct warning: unverified 'done' claims propagate errors downstream, and automated faithfulness checking looks like a necessary safety layer, not a nice-to-have."
+          ]
+        },
+        {
+          "id": "2611.24324v1",
+          "pub": "2026-11-18T12:26:42+00:00",
+          "title": "Reducing Inference Cost of Coding Agents with Timeout Cascades",
+          "link": "http://arxiv.org/abs/2611.24324v1",
+          "cats": [
+            "cs.AI",
+            "cs.SE"
+          ]
+        },
+        {
+          "id": "2611.22901v1",
+          "pub": "2026-11-17T15:07:35+00:00",
+          "title": "Done, But Still Working: Anytime Evaluation of When Coding Agents Should Stop",
+          "link": "http://arxiv.org/abs/2611.22901v1",
+          "cats": [
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.22835v1",
+          "pub": "2026-11-17T14:17:43+00:00",
+          "title": "When Passing Checks Do Not Establish Completion: Evidence Interpretation in Coding Agents",
+          "link": "http://arxiv.org/abs/2611.22835v1",
+          "cats": [
+            "cs.CL",
+            "cs.SE"
+          ]
         },
         {
           "id": "2611.21056v1",
           "pub": "2026-11-16T13:05:46+00:00",
           "title": "Evaluation-Free Recursive Self-Improvement for Coding Agents",
           "link": "http://arxiv.org/abs/2611.21056v1",
-          "authors": [
-            "Zhe Ren",
-            "Guowei Rong",
-            "Yimeng Chen",
-            "Nanbo Li",
-            "Piotr Pi\u0119kos",
-            "Mateusz Ostaszewski",
-            "Dandan Guo",
-            "J\u00fcrgen Schmidhuber"
-          ],
           "cats": [
             "cs.CL",
             "cs.NE"
-          ],
-          "why": "Shows a self-improving coding-agent loop can get almost all the way to Darwin/Huxley-Godel-Machine-level gains without ever running costly downstream task evaluations inside the loop.",
-          "summary_text": "ELITE (Explore-then-Integrate) reframes recursive self-improvement for coding agents: instead of evaluating and selecting a single best mutated lineage on live tasks, it generates several independent improvement proposals from the same parent, inspects their implementations for complementary versus conflicting mechanisms, and merges a compatible subset into one new descendant using only deterministic structural and validity checks. On SWE-bench Pro this lifts the base agent from 60.0% to 85.6%, within a few points of methods that do spend heavy evaluation budget, while cutting wall-clock evolution time by up to 8.8x and using zero downstream task evaluations during evolution. For software factories that want agents bootstrapping their own tooling continuously, this suggests self-improvement loops can be made dramatically cheaper and faster without sacrificing much of the resulting capability gain."
-        },
-        {
-          "id": "2611.21152v2",
-          "pub": "2026-11-16T14:20:58+00:00",
-          "title": "From Repositories to Training Environments: Scaling Long-Horizon Coding Agents with Environment Evolution Loop",
-          "link": "http://arxiv.org/abs/2611.21152v2",
-          "authors": [
-            "Yang Tian",
-            "Tianyu Zheng",
-            "Xiyuan Yang",
-            "Yaxin Du",
-            "Chengran Yang",
-            "Bo Zhao",
-            "Jian Yang",
-            "Bryan Dai"
-          ],
-          "cats": [
-            "cs.CL"
-          ],
-          "why": "An actual factory for building the training environments coding agents learn from, which is exactly the kind of infrastructure a 'software factory' needs to scale beyond hand-curated benchmarks.",
-          "summary_text": "RepoFactory is an automated pipeline that turns real-world repositories into verifiable, from-scratch build tasks for training long-horizon coding agents, rather than relying on a fixed, linear validation step at the end of environment creation. Its Environment Evolution Loop iteratively optimizes each generated environment against a combined objective of validity, structural coupling, and implementation scope, using cheap proxy signals instead of expensive downstream rollouts, and the system has produced over 10,000 environments spanning 17 software domains. Training a Qwen3.5-35B-A3B model on this data yields consistent double-digit gains over training without the evolution loop, across both a dedicated repo-building benchmark and a suite of general long-horizon and agentic coding tasks. It's a concrete demonstration that the environments feeding a coding-agent training pipeline can themselves be synthesized and improved at scale, which matters for anyone trying to bootstrap agent capability beyond hand-labeled datasets."
-        },
-        {
-          "id": "2611.23817v1",
-          "pub": "2026-11-18T04:19:48+00:00",
-          "title": "Metrics-in-the-Loop: Complexity Feedback Reshapes Agent-Written Code",
-          "link": "http://arxiv.org/abs/2611.23817v1",
-          "authors": [
-            "Nicolas Chapados",
-            "Jean-Fran\u00e7ois Gagn\u00e9",
-            "Nouha Dziri"
-          ],
-          "cats": [
-            "cs.AI"
-          ],
-          "why": "A simple, cheap intervention for one of the real risks of running an autonomous software factory: agents quietly piling up complexity on top of code they'll keep extending.",
-          "summary_text": "The authors note that long-running coding agents are mostly steered by whether tests pass, which says nothing about whether the code they're producing is getting harder to maintain or losing test coverage as it grows. Their fix, metrics-in-the-loop, injects short, automatically computed feedback messages into the agent's context after each code-changing turn, flagging functions whose cyclomatic complexity crossed a threshold or lines that tests don't cover, giving the agent a chance to refactor or add tests before moving on. Across three long-horizon coding benchmarks and four strong models, complexity feedback measurably reduces complexity buildup without hurting held-out correctness. As a lightweight, model-agnostic re-railing mechanism, this is a practical pattern for keeping autonomous build pipelines from quietly accumulating technical debt as codebases scale to millions of lines."
-        },
-        {
-          "id": "2611.21784v2",
-          "pub": "2026-11-16T19:09:35+00:00",
-          "title": "Revisiting the Survival of Agent-Attributed Code: How Measurement Choices Decide the Verdict",
-          "link": "http://arxiv.org/abs/2611.21784v2",
-          "authors": [
-            "Musfiqur Rahman",
-            "Mahi Begoug",
-            "Emad Shihab"
-          ],
-          "cats": [
-            "cs.SE",
-            "cs.AI"
-          ],
-          "why": "A sobering methodological audit of how we actually know whether AI-written code holds up in production, finding the 'verdict' is often an artifact of analysis choices, not the code itself.",
-          "summary_text": "Working from 854,139 lines added by 2,802 merged pull requests across 215 repositories in the AIDev dataset, the authors vary nine measurement choices across 88 separate survival analyses to see how much conclusions about agent-written code's longevity depend on methodology rather than reality. For human-supervised agents like GitHub Copilot the direction of the effect is stable, but for the fully-autonomous agent Devin, the verdict flips depending on whether standard errors are clustered by repository, with most specifications only detecting a 'modified sooner' effect when repository-level correlation is ignored (something permuted labels can also produce). They also show that LLM-based intent classifiers agree with human judgment about as well as two humans agree with each other, while keyword-based classifiers do not. The paper lands a useful operationalization checklist for anyone studying how durable agent-generated code really is, which matters a great deal if post-merge survival is going to be used as evidence that software factories' output is production-grade."
+          ]
         }
       ]
     }

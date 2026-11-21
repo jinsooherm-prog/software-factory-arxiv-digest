@@ -3,18 +3,19 @@
 Daily arXiv digest generator for "software factories" (AI coding agents,
 autonomous SWE agents, agentic software engineering, LLM dev pipelines).
 
-Workflow:
-  1. Query arXiv API for recent papers matching a broad keyword set.
-  2. Filter to papers published in the last N days not already in state.json.
-  3. Rank candidates (simple heuristic: category match + recency) and emit a
-     shortlist for an LLM (or human) to pick the "5 most interesting" and
-     write one-paragraph summaries into selections.json.
-  4. Render index.html (rolling top 5) + archive/YYYY-MM-DD.html + archive/index.html.
+Format: ONE consolidated daily briefing (single flowing narrative covering
+up to 10 papers, written by an LLM) rather than per-paper repeated cards.
 
-This script does the mechanical fetch/filter/render. The "pick interesting +
-summarize" step is meant to be driven by the agent (Hermes) reading
-candidates.json and writing selections.json, OR by the --auto fallback
-below which does an extractive stub summary if no selections.json is given.
+Workflow:
+  1. `candidates --hours 23` queries arXiv for the given lookback window and
+     prints unseen papers (not already in state.json) as JSON.
+  2. An LLM agent reads that JSON, picks up to 10 genuinely interesting /
+     on-topic papers, and writes ONE cohesive briefing (headline + flowing
+     HTML summary with inline links to each paper it mentions) into a
+     briefing JSON file.
+  3. `publish --briefing briefing.json --date YYYY-MM-DD` renders
+     index.html (today's briefing, "current" page), archive/YYYY-MM-DD.html,
+     and archive/index.html, and records the paper IDs as seen.
 """
 import argparse
 import datetime
@@ -22,7 +23,6 @@ import html
 import json
 import os
 import re
-import sys
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -58,15 +58,19 @@ def fetch_arxiv(max_results=150):
     root = ET.fromstring(data)
     entries = []
     for e in root.findall('atom:entry', NS):
-        pub_str = e.find('atom:published', NS).text
-        pub = datetime.datetime.strptime(pub_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
-        title = re.sub(r'\s+', ' ', e.find('atom:title', NS).text.strip())
-        summary = re.sub(r'\s+', ' ', e.find('atom:summary', NS).text.strip())
-        link = e.find('atom:id', NS).text.strip()
+        pub_el = e.find('atom:published', NS)
+        title_el = e.find('atom:title', NS)
+        summary_el = e.find('atom:summary', NS)
+        id_el = e.find('atom:id', NS)
+        if pub_el is None or title_el is None or summary_el is None or id_el is None:
+            continue
+        pub = datetime.datetime.strptime(pub_el.text, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+        title = re.sub(r'\s+', ' ', title_el.text.strip())
+        summary = re.sub(r'\s+', ' ', summary_el.text.strip())
+        link = id_el.text.strip()
         arxiv_id = link.rstrip('/').split('/')[-1]
-        authors = [a.find('atom:name', NS).text for a in e.findall('atom:author', NS)]
-        cats = [c.get('term') for c in e.findall('{http://arxiv.org/schemas/atom}category', NS)] if False else \
-               [c.get('term') for c in e.findall('atom:category', NS)]
+        authors = [a.find('atom:name', NS).text for a in e.findall('atom:author', NS) if a.find('atom:name', NS) is not None]
+        cats = [c.get('term') for c in e.findall('atom:category', NS)]
         entries.append({
             'id': arxiv_id, 'pub': pub.isoformat(), 'title': title,
             'summary': summary, 'link': link, 'authors': authors, 'cats': cats,
@@ -78,7 +82,7 @@ def load_state():
     if os.path.exists(STATE_PATH):
         with open(STATE_PATH) as f:
             return json.load(f)
-    return {'seen_ids': [], 'history': []}  # history: list of {date, papers: [...]}
+    return {'seen_ids': [], 'history': []}
 
 
 def save_state(state):
@@ -87,12 +91,11 @@ def save_state(state):
 
 
 def cmd_candidates(args):
-    """Fetch + filter new, unseen papers from the last N days; dump JSON for review."""
     state = load_state()
     seen = set(state['seen_ids'])
     entries = fetch_arxiv()
     now = datetime.datetime.now(datetime.timezone.utc)
-    cutoff = now - datetime.timedelta(days=args.days)
+    cutoff = now - datetime.timedelta(hours=args.hours)
     out = []
     for e in entries:
         pub = datetime.datetime.fromisoformat(e['pub'])
@@ -109,121 +112,220 @@ def esc(s):
     return html.escape(s, quote=True)
 
 
-def render_paper_card(p):
-    authors = ", ".join(p.get('authors', [])[:6])
-    if len(p.get('authors', [])) > 6:
-        authors += ", et al."
-    cats = ", ".join(p.get('cats', []))
-    return f"""
-    <article class="card">
-      <h3><a href="{esc(p['link'])}" target="_blank" rel="noopener">{esc(p['title'])}</a></h3>
-      <div class="meta">{esc(authors)} &middot; {esc(cats)} &middot; {esc(p['pub'][:10])}</div>
-      <p class="why">{esc(p.get('why', ''))}</p>
-      <p class="summary">{esc(p.get('summary_text', p.get('summary', '')))}</p>
-      <a class="abs-link" href="{esc(p['link'])}" target="_blank" rel="noopener">View on arXiv &rarr;</a>
-    </article>
-    """
-
-
 PAGE_CSS = """
-:root { color-scheme: dark; }
+:root {
+  color-scheme: dark;
+  --bg: #07080c;
+  --bg-grad: radial-gradient(1200px 600px at 15% -10%, #1b2a4a33, transparent 60%),
+             radial-gradient(1000px 500px at 110% 0%, #4a1b4a33, transparent 55%),
+             #07080c;
+  --panel: #10131aee;
+  --panel-border: #22283a;
+  --text: #eef0f5;
+  --muted: #8a93a8;
+  --accent1: #6ee7ff;
+  --accent2: #b899ff;
+  --accent3: #ff9ecb;
+  --good: #7ee8a0;
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
-  margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #0b0d12; color: #e6e8ee; line-height: 1.55;
+  margin: 0; font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-grad); color: var(--text); line-height: 1.65; min-height: 100vh;
 }
-header { padding: 3rem 1.5rem 2rem; text-align: center; border-bottom: 1px solid #1c212c; }
-header h1 { font-size: 1.9rem; margin: 0 0 0.4rem; background: linear-gradient(90deg,#7dd3fc,#a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
-header p { color: #9aa4b2; margin: 0.2rem 0; }
-nav.top { text-align: center; padding: 0.8rem; font-size: 0.9rem; }
-nav.top a { color: #7dd3fc; text-decoration: none; margin: 0 0.6rem; }
-nav.top a:hover { text-decoration: underline; }
-main { max-width: 820px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
-.card {
-  background: #11141b; border: 1px solid #1c212c; border-radius: 14px;
-  padding: 1.4rem 1.6rem; margin: 1.4rem 0;
+::selection { background: #6ee7ff44; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px);
+  background: #0a0c12cc; border-bottom: 1px solid var(--panel-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.6rem;
 }
-.card h3 { margin: 0 0 0.4rem; font-size: 1.15rem; }
-.card h3 a { color: #e6e8ee; text-decoration: none; }
-.card h3 a:hover { color: #7dd3fc; }
-.meta { font-size: 0.8rem; color: #7b8494; margin-bottom: 0.7rem; }
-.why { color: #a78bfa; font-weight: 600; font-size: 0.9rem; margin: 0.3rem 0; }
-.summary { color: #c6cad3; font-size: 0.95rem; }
-.abs-link { display: inline-block; margin-top: 0.6rem; font-size: 0.85rem; color: #7dd3fc; text-decoration: none; }
-.abs-link:hover { text-decoration: underline; }
-footer { text-align: center; color: #5c6476; font-size: 0.8rem; padding: 2rem 0; }
-.archive-list { list-style: none; padding: 0; }
-.archive-list li { margin: 0.5rem 0; }
-.archive-list a { color: #7dd3fc; text-decoration: none; }
-.archive-list a:hover { text-decoration: underline; }
-.badge { display:inline-block; background:#1c212c; color:#9aa4b2; border-radius:999px; padding:0.15rem 0.7rem; font-size:0.75rem; margin-left:0.5rem; }
+.topbar .brand { display:flex; align-items:center; gap:0.6rem; font-weight: 700; letter-spacing: -0.01em; }
+.topbar .brand .dot { width:10px; height:10px; border-radius:50%; background: linear-gradient(135deg,var(--accent1),var(--accent2)); box-shadow: 0 0 14px #6ee7ff99; }
+.topbar nav a { color: var(--muted); text-decoration:none; font-size:0.9rem; margin-left:1.3rem; transition: color .15s; }
+.topbar nav a:hover { color: var(--accent1); }
+
+header.hero {
+  text-align: center; padding: 5rem 1.5rem 3.2rem; position: relative; overflow: hidden;
+}
+header.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events:none;
+  background: radial-gradient(500px 240px at 50% 0%, #6ee7ff14, transparent 70%);
+}
+.eyebrow {
+  display: inline-block; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent1); background: #6ee7ff14; border: 1px solid #6ee7ff33; border-radius: 999px;
+  padding: 0.35rem 0.9rem; margin-bottom: 1.3rem;
+}
+header.hero h1 {
+  font-size: clamp(2.1rem, 5vw, 3.4rem); margin: 0 0 0.9rem; letter-spacing: -0.02em; font-weight: 800;
+  background: linear-gradient(100deg, var(--accent1), var(--accent2) 55%, var(--accent3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header.hero p.sub { color: var(--muted); font-size: 1.08rem; max-width: 620px; margin: 0 auto; }
+.meta-row { margin-top: 1.4rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; }
+.chip {
+  font-size: 0.78rem; color: var(--muted); border: 1px solid var(--panel-border); background: #ffffff06;
+  padding: 0.3rem 0.8rem; border-radius: 999px;
+}
+
+main { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+.briefing {
+  background: linear-gradient(180deg, #ffffff09, #ffffff02), var(--panel);
+  border: 1px solid var(--panel-border); border-radius: 22px;
+  padding: 2.4rem 2.6rem; margin: 0 0 2.6rem; position: relative;
+  box-shadow: 0 30px 80px -40px #000a, inset 0 1px 0 #ffffff0d;
+}
+.briefing .date-badge {
+  display:inline-flex; align-items:center; gap:0.4rem; font-size:0.78rem; color: var(--good);
+  background:#7ee8a014; border:1px solid #7ee8a033; padding:0.25rem 0.75rem; border-radius:999px; margin-bottom:1.1rem;
+}
+.briefing h2 { font-size: 1.6rem; margin: 0 0 1rem; letter-spacing: -0.01em; }
+.briefing .prose { font-size: 1.04rem; color: #d6dae3; }
+.briefing .prose p { margin: 0 0 1rem; }
+.briefing .prose a { color: var(--accent1); text-decoration: none; border-bottom: 1px dotted #6ee7ff66; }
+.briefing .prose a:hover { color: #fff; border-color: #fff; }
+
+.papers-ref { margin-top: 2.2rem; padding-top: 1.6rem; border-top: 1px dashed var(--panel-border); }
+.papers-ref h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 1rem; }
+.paper-pill {
+  display: flex; align-items: baseline; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid #ffffff08;
+  font-size: 0.92rem;
+}
+.paper-pill:last-child { border-bottom: none; }
+.paper-pill a.title { color: var(--text); text-decoration: none; font-weight: 600; flex: 1; }
+.paper-pill a.title:hover { color: var(--accent1); }
+.paper-pill .cat { font-size: 0.72rem; color: var(--muted); background:#ffffff08; padding:0.15rem 0.55rem; border-radius:999px; white-space:nowrap; }
+
+section.archive-section h2 { font-size: 1.3rem; margin: 0 0 1.2rem; }
+.archive-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 0.8rem; }
+.archive-card {
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
+  padding: 1rem 1.1rem; text-decoration:none; color: var(--text); transition: transform .15s, border-color .15s;
+}
+.archive-card:hover { transform: translateY(-2px); border-color: #6ee7ff55; }
+.archive-card .d { font-weight: 700; font-size: 0.95rem; }
+.archive-card .n { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+
+footer { text-align:center; color: var(--muted); font-size: 0.82rem; padding: 2.5rem 1.5rem 3rem; border-top: 1px solid var(--panel-border); margin-top: 1rem; }
+footer a { color: var(--accent1); text-decoration:none; }
 """
 
 
-def render_index(latest_date, latest_papers, history):
-    cards = "\n".join(render_paper_card(p) for p in latest_papers)
-    archive_items = "\n".join(
-        f'<li><a href="archive/{h["date"]}.html">{h["date"]}</a> <span class="badge">{len(h["papers"])} papers</span></li>'
-        for h in sorted(history, key=lambda x: x['date'], reverse=True)
-    )
+def render_papers_ref(papers):
+    items = []
+    for p in papers:
+        cats = ", ".join(p.get('cats', [])[:3])
+        items.append(
+            f'<div class="paper-pill"><a class="title" href="{esc(p["link"])}" target="_blank" rel="noopener">{esc(p["title"])}</a>'
+            f'<span class="cat">{esc(cats)}</span></div>'
+        )
+    return "\n".join(items)
+
+
+def render_topbar():
+    return """
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span> Software Factories</div>
+      <nav><a href="#briefing">Briefing</a><a href="archive/index.html">Archive</a><a href="https://arxiv.org/list/cs.SE/recent" target="_blank" rel="noopener">arXiv cs.SE</a></nav>
+    </div>
+    """
+
+
+def render_index(date_str, headline, summary_html, papers, history):
     updated = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    archive_cards = "\n".join(
+        f'<a class="archive-card" href="archive/{h["date"]}.html"><div class="d">{esc(h["date"])}</div>'
+        f'<div class="n">{len(h["papers"])} papers</div></a>'
+        for h in sorted(history, key=lambda x: x['date'], reverse=True)[:12]
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Software Factories — arXiv Daily Digest</title>
+<title>Software Factories — Daily arXiv Briefing</title>
+<meta name="description" content="A daily, single-briefing digest of the most interesting arXiv research on AI coding agents and autonomous software engineering.">
 <style>{PAGE_CSS}</style>
 </head>
 <body>
-<header>
-  <h1>Software Factories — arXiv Daily Digest</h1>
-  <p>Top 5 most interesting recent papers on AI coding agents, autonomous software engineering, and agentic dev pipelines.</p>
-  <p>Last updated: {updated} &middot; latest digest date: {esc(latest_date)}</p>
+{render_topbar()}
+<header class="hero">
+  <span class="eyebrow">Daily arXiv Briefing</span>
+  <h1>Software Factories</h1>
+  <p class="sub">One daily briefing on AI coding agents, autonomous software engineering, and the research shaping how software gets built by machines.</p>
+  <div class="meta-row">
+    <span class="chip">Updated {esc(updated)}</span>
+    <span class="chip">Covers last 23h of arXiv</span>
+    <span class="chip">Up to 10 papers/day</span>
+  </div>
 </header>
-<nav class="top"><a href="#top5">Current Top 5</a><a href="archive/index.html">Full Archive</a><a href="https://arxiv.org/list/cs.SE/recent" target="_blank" rel="noopener">arXiv cs.SE</a></nav>
 <main>
-  <h2 id="top5">Current Top 5 ({esc(latest_date)})</h2>
-  {cards}
-  <h2>Archive</h2>
-  <ul class="archive-list">
-    {archive_items}
-  </ul>
+  <section class="briefing" id="briefing">
+    <div class="date-badge">● {esc(date_str)}</div>
+    <h2>{esc(headline)}</h2>
+    <div class="prose">
+      {summary_html}
+    </div>
+    <div class="papers-ref">
+      <h3>Papers in this briefing ({len(papers)})</h3>
+      {render_papers_ref(papers)}
+    </div>
+  </section>
+
+  <section class="archive-section">
+    <h2>Past briefings</h2>
+    <div class="archive-grid">
+      {archive_cards}
+    </div>
+  </section>
 </main>
-<footer>Generated automatically by a Hermes Agent daily cron job. Source keywords cover AI coding agents / agentic software engineering / software factories broadly.</footer>
+<footer>Generated automatically by a Hermes Agent daily cron job · one briefing a day, zero noise on days with nothing new · <a href="archive/index.html">full archive</a></footer>
 </body>
 </html>
 """
 
 
-def render_archive_page(date_str, papers):
-    cards = "\n".join(render_paper_card(p) for p in papers)
+def render_archive_page(date_str, headline, summary_html, papers):
     return f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{esc(date_str)} — Software Factories Digest</title>
+<title>{esc(date_str)} — Software Factories Briefing</title>
 <style>{PAGE_CSS}</style>
 </head>
 <body>
-<header>
-  <h1>Software Factories Digest</h1>
-  <p>{esc(date_str)}</p>
+{render_topbar()}
+<header class="hero" style="padding:3.2rem 1.5rem 2rem;">
+  <span class="eyebrow">Archived Briefing</span>
+  <h1 style="font-size:2.1rem;">{esc(date_str)}</h1>
 </header>
-<nav class="top"><a href="../index.html">Home</a><a href="index.html">Archive index</a></nav>
 <main>
-  {cards}
+  <section class="briefing">
+    <h2>{esc(headline)}</h2>
+    <div class="prose">
+      {summary_html}
+    </div>
+    <div class="papers-ref">
+      <h3>Papers in this briefing ({len(papers)})</h3>
+      {render_papers_ref(papers)}
+    </div>
+  </section>
 </main>
-<footer>Generated automatically by a Hermes Agent daily cron job.</footer>
+<footer><a href="../index.html">&larr; Back to current briefing</a> &middot; <a href="index.html">All briefings</a></footer>
 </body>
 </html>
 """
 
 
 def render_archive_index(history):
-    items = "\n".join(
-        f'<li><a href="{h["date"]}.html">{h["date"]}</a> <span class="badge">{len(h["papers"])} papers</span></li>'
+    cards = "\n".join(
+        f'<a class="archive-card" href="{h["date"]}.html"><div class="d">{esc(h["date"])}</div>'
+        f'<div class="n">{len(h["papers"])} papers</div></a>'
         for h in sorted(history, key=lambda x: x['date'], reverse=True)
     )
     return f"""<!doctype html>
@@ -231,54 +333,57 @@ def render_archive_index(history):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Archive — Software Factories Digest</title>
+<title>Archive — Software Factories</title>
 <style>{PAGE_CSS}</style>
 </head>
 <body>
-<header><h1>Digest Archive</h1></header>
-<nav class="top"><a href="../index.html">Home</a></nav>
+{render_topbar()}
+<header class="hero" style="padding:3.2rem 1.5rem 2rem;">
+  <span class="eyebrow">Archive</span>
+  <h1 style="font-size:2.1rem;">All briefings</h1>
+</header>
 <main>
-<ul class="archive-list">
-{items}
-</ul>
+  <section class="archive-section">
+    <div class="archive-grid">
+      {cards}
+    </div>
+  </section>
 </main>
+<footer><a href="../index.html">&larr; Back to current briefing</a></footer>
 </body>
 </html>
 """
 
 
 def cmd_publish(args):
-    """Consume a selections.json (list of chosen papers with 'why' and 'summary_text'),
-    append to state/history, write index.html + archive pages."""
-    with open(args.selections) as f:
-        selections = json.load(f)
-    if not selections:
-        print("No selections given, nothing to publish.")
+    with open(args.briefing) as f:
+        b = json.load(f)
+    papers = b['papers']
+    if not papers:
+        print("No papers in briefing, nothing to publish.")
         return
+    papers = papers[:10]
 
     date_str = args.date or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     state = load_state()
-
-    # mark these ids as seen
-    for p in selections:
+    for p in papers:
         if p['id'] not in state['seen_ids']:
             state['seen_ids'].append(p['id'])
 
-    # update history (one entry per date; if rerun same day, replace)
     history = [h for h in state.get('history', []) if h['date'] != date_str]
-    history.append({'date': date_str, 'papers': selections})
+    history.append({'date': date_str, 'headline': b['headline'], 'papers': papers})
     state['history'] = history
     save_state(state)
 
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
     with open(os.path.join(ARCHIVE_DIR, f"{date_str}.html"), 'w') as f:
-        f.write(render_archive_page(date_str, selections))
+        f.write(render_archive_page(date_str, b['headline'], b['summary_html'], papers))
     with open(os.path.join(ARCHIVE_DIR, "index.html"), 'w') as f:
         f.write(render_archive_index(history))
     with open(os.path.join(ROOT, "index.html"), 'w') as f:
-        f.write(render_index(date_str, selections, history))
+        f.write(render_index(date_str, b['headline'], b['summary_html'], papers, history))
 
-    print(f"Published digest for {date_str} with {len(selections)} papers.")
+    print(f"Published briefing for {date_str} covering {len(papers)} papers.")
 
 
 if __name__ == "__main__":
@@ -286,11 +391,11 @@ if __name__ == "__main__":
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     c = sub.add_parser("candidates", help="fetch+filter unseen recent papers as JSON")
-    c.add_argument("--days", type=int, default=7)
+    c.add_argument("--hours", type=float, default=23)
     c.set_defaults(func=cmd_candidates)
 
-    p = sub.add_parser("publish", help="render site from a selections.json")
-    p.add_argument("--selections", required=True)
+    p = sub.add_parser("publish", help="render site from a briefing.json")
+    p.add_argument("--briefing", required=True)
     p.add_argument("--date", default=None)
     p.set_defaults(func=cmd_publish)
 
