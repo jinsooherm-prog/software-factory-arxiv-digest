@@ -43,7 +43,7 @@ NS = {'atom': 'http://www.w3.org/2005/Atom'}
 
 
 def fetch_arxiv(max_results=150):
-    base = "http://export.arxiv.org/api/query"
+    base = "https://export.arxiv.org/api/query"
     search_query = "(" + " OR ".join(f'all:"{k}"' for k in KEYWORDS) + ")"
     params = {
         'search_query': search_query,
@@ -54,7 +54,7 @@ def fetch_arxiv(max_results=150):
     }
     url = base + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    data = urllib.request.urlopen(req, timeout=30).read()
+    data = urllib.request.urlopen(req, timeout=90).read()
     root = ET.fromstring(data)
     entries = []
     for e in root.findall('atom:entry', NS):
