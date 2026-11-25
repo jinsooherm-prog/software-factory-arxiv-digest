@@ -9,7 +9,10 @@
     "2611.24324v1",
     "2611.22901v1",
     "2611.22835v1",
-    "2611.21056v1"
+    "2611.21056v1",
+    "2611.32973v1",
+    "2611.33093v1",
+    "2611.32931v1"
   ],
   "history": [
     {
@@ -113,6 +116,40 @@
           "cats": [
             "cs.CL",
             "cs.NE"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "headline": "Judging coding agents gets harder as the targets move past ordinary code",
+      "papers": [
+        {
+          "id": "2611.32973v1",
+          "pub": "2026-11-24T17:07:54+00:00",
+          "title": "SpecEngineeringBench: Evaluating Coding Agents as Autonomous Specification Engineers",
+          "link": "http://arxiv.org/abs/2611.32973v1",
+          "cats": [
+            "cs.SE"
+          ]
+        },
+        {
+          "id": "2611.33093v1",
+          "pub": "2026-11-24T18:28:41+00:00",
+          "title": "AIChipBench: Benchmarking LLM Agents for Automated AI Accelerator Design",
+          "link": "http://arxiv.org/abs/2611.33093v1",
+          "cats": [
+            "cs.CL",
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.32931v1",
+          "pub": "2026-11-24T16:38:25+00:00",
+          "title": "Reading Decisions Before Spans: Efficient Generative Verification",
+          "link": "http://arxiv.org/abs/2611.32931v1",
+          "cats": [
+            "cs.AI"
           ]
         }
       ]

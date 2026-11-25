@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026-11-25 — Software Factories Briefing</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #07080c;
+  --bg-grad: radial-gradient(1200px 600px at 15% -10%, #1b2a4a33, transparent 60%),
+             radial-gradient(1000px 500px at 110% 0%, #4a1b4a33, transparent 55%),
+             #07080c;
+  --panel: #10131aee;
+  --panel-border: #22283a;
+  --text: #eef0f5;
+  --muted: #8a93a8;
+  --accent1: #6ee7ff;
+  --accent2: #b899ff;
+  --accent3: #ff9ecb;
+  --good: #7ee8a0;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-grad); color: var(--text); line-height: 1.65; min-height: 100vh;
+}
+::selection { background: #6ee7ff44; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px);
+  background: #0a0c12cc; border-bottom: 1px solid var(--panel-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.6rem;
+}
+.topbar .brand { display:flex; align-items:center; gap:0.6rem; font-weight: 700; letter-spacing: -0.01em; }
+.topbar .brand .dot { width:10px; height:10px; border-radius:50%; background: linear-gradient(135deg,var(--accent1),var(--accent2)); box-shadow: 0 0 14px #6ee7ff99; }
+.topbar nav a { color: var(--muted); text-decoration:none; font-size:0.9rem; margin-left:1.3rem; transition: color .15s; }
+.topbar nav a:hover { color: var(--accent1); }
+
+header.hero {
+  text-align: center; padding: 5rem 1.5rem 3.2rem; position: relative; overflow: hidden;
+}
+header.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events:none;
+  background: radial-gradient(500px 240px at 50% 0%, #6ee7ff14, transparent 70%);
+}
+.eyebrow {
+  display: inline-block; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent1); background: #6ee7ff14; border: 1px solid #6ee7ff33; border-radius: 999px;
+  padding: 0.35rem 0.9rem; margin-bottom: 1.3rem;
+}
+header.hero h1 {
+  font-size: clamp(2.1rem, 5vw, 3.4rem); margin: 0 0 0.9rem; letter-spacing: -0.02em; font-weight: 800;
+  background: linear-gradient(100deg, var(--accent1), var(--accent2) 55%, var(--accent3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header.hero p.sub { color: var(--muted); font-size: 1.08rem; max-width: 620px; margin: 0 auto; }
+.meta-row { margin-top: 1.4rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; }
+.chip {
+  font-size: 0.78rem; color: var(--muted); border: 1px solid var(--panel-border); background: #ffffff06;
+  padding: 0.3rem 0.8rem; border-radius: 999px;
+}
+
+main { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+.briefing {
+  background: linear-gradient(180deg, #ffffff09, #ffffff02), var(--panel);
+  border: 1px solid var(--panel-border); border-radius: 22px;
+  padding: 2.4rem 2.6rem; margin: 0 0 2.6rem; position: relative;
+  box-shadow: 0 30px 80px -40px #000a, inset 0 1px 0 #ffffff0d;
+}
+.briefing .date-badge {
+  display:inline-flex; align-items:center; gap:0.4rem; font-size:0.78rem; color: var(--good);
+  background:#7ee8a014; border:1px solid #7ee8a033; padding:0.25rem 0.75rem; border-radius:999px; margin-bottom:1.1rem;
+}
+.briefing h2 { font-size: 1.6rem; margin: 0 0 1rem; letter-spacing: -0.01em; }
+.briefing .prose { font-size: 1.04rem; color: #d6dae3; }
+.briefing .prose p { margin: 0 0 1rem; }
+.briefing .prose a { color: var(--accent1); text-decoration: none; border-bottom: 1px dotted #6ee7ff66; }
+.briefing .prose a:hover { color: #fff; border-color: #fff; }
+
+.papers-ref { margin-top: 2.2rem; padding-top: 1.6rem; border-top: 1px dashed var(--panel-border); }
+.papers-ref h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 1rem; }
+.paper-pill {
+  display: flex; align-items: baseline; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid #ffffff08;
+  font-size: 0.92rem;
+}
+.paper-pill:last-child { border-bottom: none; }
+.paper-pill a.title { color: var(--text); text-decoration: none; font-weight: 600; flex: 1; }
+.paper-pill a.title:hover { color: var(--accent1); }
+.paper-pill .cat { font-size: 0.72rem; color: var(--muted); background:#ffffff08; padding:0.15rem 0.55rem; border-radius:999px; white-space:nowrap; }
+
+section.archive-section h2 { font-size: 1.3rem; margin: 0 0 1.2rem; }
+.archive-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 0.8rem; }
+.archive-card {
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
+  padding: 1rem 1.1rem; text-decoration:none; color: var(--text); transition: transform .15s, border-color .15s;
+}
+.archive-card:hover { transform: translateY(-2px); border-color: #6ee7ff55; }
+.archive-card .d { font-weight: 700; font-size: 0.95rem; }
+.archive-card .n { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+
+footer { text-align:center; color: var(--muted); font-size: 0.82rem; padding: 2.5rem 1.5rem 3rem; border-top: 1px solid var(--panel-border); margin-top: 1rem; }
+footer a { color: var(--accent1); text-decoration:none; }
+</style>
+</head>
+<body>
+
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span> Software Factories</div>
+      <nav><a href="#briefing">Briefing</a><a href="archive/index.html">Archive</a><a href="https://arxiv.org/list/cs.SE/recent" target="_blank" rel="noopener">arXiv cs.SE</a></nav>
+    </div>
+    
+<header class="hero" style="padding:3.2rem 1.5rem 2rem;">
+  <span class="eyebrow">Archived Briefing</span>
+  <h1 style="font-size:2.1rem;">2026-11-25</h1>
+</header>
+<main>
+  <section class="briefing">
+    <h2>Judging coding agents gets harder as the targets move past ordinary code</h2>
+    <div class="prose">
+      <p>Today's crop zeroes in on a problem that keeps resurfacing as coding agents mature: passing a test is not the same as doing the job right, and today's benchmarks mostly measure the former. <a href="http://arxiv.org/abs/2611.32973v1" target="_blank" rel="noopener">SpecEngineeringBench</a> makes this explicit by stripping away the usual scaffolding — no issue description, no designated test entry point, no pointer to which files matter — and asking seven frontier coding agents to act as autonomous specification engineers: translate functional requirements into their own test suites, then use those tests to hunt for real defects across 100 instances drawn from 78 open-source Python repositories. The results are sobering in a specific way: agents write valid, high-coverage tests (91% Head Pass Rate, over 80% change-focused coverage) but their actual defect-detection rate lags far behind at roughly 26%, and the ability to say precisely where a bug lives collapses from 78% recall at the file level to barely 51% at the function level. In other words, agents are good at looking busy and thorough while still missing the point.</p><p><a href="http://arxiv.org/abs/2611.33093v1" target="_blank" rel="noopener">AIChipBench</a> pushes the same diagnosis into a domain where the stakes of "looks right but isn't" are even higher: having LLM coding agents implement quantized LLM decoders as synthesizable RTL hardware. Because a decoder carries state across steps, a design can pass every visible output test and still be silently wrong several tokens later — and indeed, when the authors regrade "accepted" designs on harder held-out sequences, 45 of 69 fail within just 32 steps. The fix that actually moves the needle isn't a smarter agent but better feedback: pointing agents at the first point where internal state diverges, rather than just the final output, lifts acceptance by 25 to 47 percentage points and halves the debugging effort, a strong argument that today's coding-agent harnesses are bottlenecked on what they're told about their own mistakes, not on raw capability.</p><p><a href="http://arxiv.org/abs/2611.32931v1" target="_blank" rel="noopener">Reading Decisions Before Spans</a> attacks the adjacent cost problem: once you accept that verifying an agent's work requires a careful generative verifier rather than a cheap pass/fail check, that verification itself becomes expensive at scale. Studying over 2,000 code-agent test responses, the authors show that a verifier's real decision — is this claim supported or not — is settled at a single early branch point in its output, long before it generates the full quoted error spans that justify that call. By training the verifier to stop (or to be prompted to answer) right at that branch, they cut compute by as much as 85% relative to full-length generation while keeping the same F1 score, suggesting that the overhead of double-checking an agent's work can be slashed without weakening the check itself. Taken together, the day's papers sketch a consistent picture: as coding agents get judged on increasingly open-ended, state-aware, and expensive-to-verify tasks, the limiting factor isn't agent intelligence so much as the design of the feedback loop that tells them — and tells us — whether they actually finished the job.</p>
+    </div>
+    <div class="papers-ref">
+      <h3>Papers in this briefing (3)</h3>
+      <div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.32973v1" target="_blank" rel="noopener">SpecEngineeringBench: Evaluating Coding Agents as Autonomous Specification Engineers</a><span class="cat">cs.SE</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.33093v1" target="_blank" rel="noopener">AIChipBench: Benchmarking LLM Agents for Automated AI Accelerator Design</a><span class="cat">cs.CL, cs.AI</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.32931v1" target="_blank" rel="noopener">Reading Decisions Before Spans: Efficient Generative Verification</a><span class="cat">cs.AI</span></div>
+    </div>
+  </section>
+</main>
+<footer><a href="../index.html">&larr; Back to current briefing</a> &middot; <a href="index.html">All briefings</a></footer>
+</body>
+</html>
