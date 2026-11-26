@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026-11-26 — Software Factories Briefing</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #07080c;
+  --bg-grad: radial-gradient(1200px 600px at 15% -10%, #1b2a4a33, transparent 60%),
+             radial-gradient(1000px 500px at 110% 0%, #4a1b4a33, transparent 55%),
+             #07080c;
+  --panel: #10131aee;
+  --panel-border: #22283a;
+  --text: #eef0f5;
+  --muted: #8a93a8;
+  --accent1: #6ee7ff;
+  --accent2: #b899ff;
+  --accent3: #ff9ecb;
+  --good: #7ee8a0;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-grad); color: var(--text); line-height: 1.65; min-height: 100vh;
+}
+::selection { background: #6ee7ff44; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px);
+  background: #0a0c12cc; border-bottom: 1px solid var(--panel-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.6rem;
+}
+.topbar .brand { display:flex; align-items:center; gap:0.6rem; font-weight: 700; letter-spacing: -0.01em; }
+.topbar .brand .dot { width:10px; height:10px; border-radius:50%; background: linear-gradient(135deg,var(--accent1),var(--accent2)); box-shadow: 0 0 14px #6ee7ff99; }
+.topbar nav a { color: var(--muted); text-decoration:none; font-size:0.9rem; margin-left:1.3rem; transition: color .15s; }
+.topbar nav a:hover { color: var(--accent1); }
+
+header.hero {
+  text-align: center; padding: 5rem 1.5rem 3.2rem; position: relative; overflow: hidden;
+}
+header.hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events:none;
+  background: radial-gradient(500px 240px at 50% 0%, #6ee7ff14, transparent 70%);
+}
+.eyebrow {
+  display: inline-block; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent1); background: #6ee7ff14; border: 1px solid #6ee7ff33; border-radius: 999px;
+  padding: 0.35rem 0.9rem; margin-bottom: 1.3rem;
+}
+header.hero h1 {
+  font-size: clamp(2.1rem, 5vw, 3.4rem); margin: 0 0 0.9rem; letter-spacing: -0.02em; font-weight: 800;
+  background: linear-gradient(100deg, var(--accent1), var(--accent2) 55%, var(--accent3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header.hero p.sub { color: var(--muted); font-size: 1.08rem; max-width: 620px; margin: 0 auto; }
+.meta-row { margin-top: 1.4rem; display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; }
+.chip {
+  font-size: 0.78rem; color: var(--muted); border: 1px solid var(--panel-border); background: #ffffff06;
+  padding: 0.3rem 0.8rem; border-radius: 999px;
+}
+
+main { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+.briefing {
+  background: linear-gradient(180deg, #ffffff09, #ffffff02), var(--panel);
+  border: 1px solid var(--panel-border); border-radius: 22px;
+  padding: 2.4rem 2.6rem; margin: 0 0 2.6rem; position: relative;
+  box-shadow: 0 30px 80px -40px #000a, inset 0 1px 0 #ffffff0d;
+}
+.briefing .date-badge {
+  display:inline-flex; align-items:center; gap:0.4rem; font-size:0.78rem; color: var(--good);
+  background:#7ee8a014; border:1px solid #7ee8a033; padding:0.25rem 0.75rem; border-radius:999px; margin-bottom:1.1rem;
+}
+.briefing h2 { font-size: 1.6rem; margin: 0 0 1rem; letter-spacing: -0.01em; }
+.briefing .prose { font-size: 1.04rem; color: #d6dae3; }
+.briefing .prose p { margin: 0 0 1rem; }
+.briefing .prose a { color: var(--accent1); text-decoration: none; border-bottom: 1px dotted #6ee7ff66; }
+.briefing .prose a:hover { color: #fff; border-color: #fff; }
+
+.papers-ref { margin-top: 2.2rem; padding-top: 1.6rem; border-top: 1px dashed var(--panel-border); }
+.papers-ref h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 1rem; }
+.paper-pill {
+  display: flex; align-items: baseline; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid #ffffff08;
+  font-size: 0.92rem;
+}
+.paper-pill:last-child { border-bottom: none; }
+.paper-pill a.title { color: var(--text); text-decoration: none; font-weight: 600; flex: 1; }
+.paper-pill a.title:hover { color: var(--accent1); }
+.paper-pill .cat { font-size: 0.72rem; color: var(--muted); background:#ffffff08; padding:0.15rem 0.55rem; border-radius:999px; white-space:nowrap; }
+
+section.archive-section h2 { font-size: 1.3rem; margin: 0 0 1.2rem; }
+.archive-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 0.8rem; }
+.archive-card {
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 14px;
+  padding: 1rem 1.1rem; text-decoration:none; color: var(--text); transition: transform .15s, border-color .15s;
+}
+.archive-card:hover { transform: translateY(-2px); border-color: #6ee7ff55; }
+.archive-card .d { font-weight: 700; font-size: 0.95rem; }
+.archive-card .n { color: var(--muted); font-size: 0.78rem; margin-top: 0.2rem; }
+
+footer { text-align:center; color: var(--muted); font-size: 0.82rem; padding: 2.5rem 1.5rem 3rem; border-top: 1px solid var(--panel-border); margin-top: 1rem; }
+footer a { color: var(--accent1); text-decoration:none; }
+</style>
+</head>
+<body>
+
+    <div class="topbar">
+      <div class="brand"><span class="dot"></span> Software Factories</div>
+      <nav><a href="#briefing">Briefing</a><a href="archive/index.html">Archive</a><a href="https://arxiv.org/list/cs.SE/recent" target="_blank" rel="noopener">arXiv cs.SE</a></nav>
+    </div>
+    
+<header class="hero" style="padding:3.2rem 1.5rem 2rem;">
+  <span class="eyebrow">Archived Briefing</span>
+  <h1 style="font-size:2.1rem;">2026-11-26</h1>
+</header>
+<main>
+  <section class="briefing">
+    <h2>Coding agents are outgrowing the text editor, and nobody has fully checked their work yet</h2>
+    <div class="prose">
+      <p>A theme running through today's crop of papers is that "coding agent" has quietly become a general-purpose production method, not just a tool for fixing GitHub issues, while the basic question of whether their output is actually correct or necessary keeps getting harder to answer. The most direct look at that question comes from <a href='http://arxiv.org/abs/2611.34875v1' target='_blank' rel='noopener'>How Much Do Coding Agents Over-Edit, and Why?</a>, which replays over 7,600 resolved Copilot CLI trajectories across 18 frontier models and traces every line of a patch back to the step that wrote it. The headline finding cuts against the usual assumption that bigger patches mean sloppier agents: most of the "extra" edits are tests and documentation rather than wasted code, and agent-written code is, on average, at least as necessary as a human developer's — though roughly 11% of it is still dead weight, and necessity varies wildly by model with no clean link to benchmark resolve rate. <a href='http://arxiv.org/abs/2611.34377v1' target='_blank' rel='noopener'>SmartLens</a> tackles the adjacent problem of living with that output day to day: an IntelliJ plugin that attributes pending changes to human or agent, flags which APIs and language features an agent used that the developer has never touched, and ranks files as review-risk hotspots — a reminder that once agents are prolific contributors, the real bottleneck shifts from writing code to knowing what to trust and learn from.</p><p>The other half of today's batch shows coding agents being pointed at domains well outside conventional software engineering, treating "write and run a program" as a general substrate for building things that used to require bespoke generation pipelines. <a href='http://arxiv.org/abs/2611.34292v1' target='_blank' rel='noopener'>WebVibe</a> trains a compact model to generate fully interactive, multi-page websites from design specs by reversing the usual synthesis order — deriving the spec from verified browser replay instead of the other way around — and gets a 9B model to match a trillion-parameter coding agent on functional website scores. <a href='http://arxiv.org/abs/2611.34813v1' target='_blank' rel='noopener'>Solve Vision with Code</a> goes further, pitting coding agents directly against video-generation models on visual reasoning tasks and finding that agents which write a rendering program to produce the answer beat native pixel-generation models by a wide margin, suggesting symbolic program synthesis is currently the more reliable route to visual reasoning. In a similar vein, <a href='http://arxiv.org/abs/2611.34414v1' target='_blank' rel='noopener'>SemProxy</a> has coding agents turn simple labeled 3D bounding boxes into full 3D models, letting users specify spatial intent while leaving geometry to the agent, and <a href='http://arxiv.org/abs/2611.34237v1' target='_blank' rel='noopener'>VibeVideoAgent</a> gives code-driven video-generation agents a way to actually watch their own draft renders — catching overlapping subtitles or out-of-sync narration that a clean program exit would otherwise hide — and shows measurable quality gains across Claude and GPT-6 Astra. Taken together, the day's work argues that coding agents are becoming the default way to produce almost any structured artifact, which only raises the stakes on the auditing and attribution problems the first two papers are trying to solve.</p>
+    </div>
+    <div class="papers-ref">
+      <h3>Papers in this briefing (6)</h3>
+      <div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34875v1" target="_blank" rel="noopener">How Much Do Coding Agents Over-Edit, and Why? An Empirical Study of Unneeded Edits in Repository-Level Agent Patches</a><span class="cat">cs.SE, cs.AI</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34377v1" target="_blank" rel="noopener">SmartLens: Turning AI Agent Changes into Learning, Review, and Risk Signals in the IDE</a><span class="cat">cs.SE</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34292v1" target="_blank" rel="noopener">WebVibe: Multimodal Interactive Website Generation via Reverse Synthesis and Visual Self-Distillation</a><span class="cat">cs.CV, cs.AI</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34813v1" target="_blank" rel="noopener">Solve Vision with Code: Coding Agents Are Stronger Visual Reasoners Than Video Models</a><span class="cat">cs.CV, cs.AI, cs.LG</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34414v1" target="_blank" rel="noopener">SemProxy: Semantic 3D Proxies for Controllable Agentic 3D Modeling</a><span class="cat">cs.CV, cs.AI</span></div>
+<div class="paper-pill"><a class="title" href="http://arxiv.org/abs/2611.34237v1" target="_blank" rel="noopener">VibeVideoAgent: Closing the Perceptual Loop for Code-Driven Video Generation</a><span class="cat">cs.CV</span></div>
+    </div>
+  </section>
+</main>
+<footer><a href="../index.html">&larr; Back to current briefing</a> &middot; <a href="index.html">All briefings</a></footer>
+</body>
+</html>

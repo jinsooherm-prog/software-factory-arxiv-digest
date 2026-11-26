@@ -12,7 +12,13 @@
     "2611.21056v1",
     "2611.32973v1",
     "2611.33093v1",
-    "2611.32931v1"
+    "2611.32931v1",
+    "2611.34875v1",
+    "2611.34377v1",
+    "2611.34292v1",
+    "2611.34813v1",
+    "2611.34414v1",
+    "2611.34237v1"
   ],
   "history": [
     {
@@ -150,6 +156,72 @@
           "link": "http://arxiv.org/abs/2611.32931v1",
           "cats": [
             "cs.AI"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-26",
+      "headline": "Coding agents are outgrowing the text editor, and nobody has fully checked their work yet",
+      "papers": [
+        {
+          "id": "2611.34875v1",
+          "pub": "2026-11-25T18:37:06+00:00",
+          "title": "How Much Do Coding Agents Over-Edit, and Why? An Empirical Study of Unneeded Edits in Repository-Level Agent Patches",
+          "link": "http://arxiv.org/abs/2611.34875v1",
+          "cats": [
+            "cs.SE",
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.34377v1",
+          "pub": "2026-11-25T13:42:16+00:00",
+          "title": "SmartLens: Turning AI Agent Changes into Learning, Review, and Risk Signals in the IDE",
+          "link": "http://arxiv.org/abs/2611.34377v1",
+          "cats": [
+            "cs.SE"
+          ]
+        },
+        {
+          "id": "2611.34292v1",
+          "pub": "2026-11-25T12:46:28+00:00",
+          "title": "WebVibe: Multimodal Interactive Website Generation via Reverse Synthesis and Visual Self-Distillation",
+          "link": "http://arxiv.org/abs/2611.34292v1",
+          "cats": [
+            "cs.CV",
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.34813v1",
+          "pub": "2026-11-25T18:01:22+00:00",
+          "title": "Solve Vision with Code: Coding Agents Are Stronger Visual Reasoners Than Video Models",
+          "link": "http://arxiv.org/abs/2611.34813v1",
+          "cats": [
+            "cs.CV",
+            "cs.AI",
+            "cs.LG",
+            "cs.MM"
+          ]
+        },
+        {
+          "id": "2611.34414v1",
+          "pub": "2026-11-25T14:08:05+00:00",
+          "title": "SemProxy: Semantic 3D Proxies for Controllable Agentic 3D Modeling",
+          "link": "http://arxiv.org/abs/2611.34414v1",
+          "cats": [
+            "cs.CV",
+            "cs.AI"
+          ]
+        },
+        {
+          "id": "2611.34237v1",
+          "pub": "2026-11-25T11:59:44+00:00",
+          "title": "VibeVideoAgent: Closing the Perceptual Loop for Code-Driven Video Generation",
+          "link": "http://arxiv.org/abs/2611.34237v1",
+          "cats": [
+            "cs.CV"
           ]
         }
       ]
